@@ -1,0 +1,75 @@
+{
+  "tests": [
+    {
+      "standard_profile": "IS_2720_5_1985",
+      "liquid_limit_method": "casagrande",
+      "metadata": {
+        "PROJ_ID": "TRAINING-ONLY",
+        "LOCA_ID": "DEMO-BH",
+        "SAMP_TOP": 2.0,
+        "SAMP_BASE": 2.5,
+        "SAMP_REF": "DEMO-S1",
+        "SAMP_TYPE": "DS",
+        "SPEC_REF": "DEMO-AL1",
+        "TEST_DATE": "2026-10-10",
+        "natural_water_content_pct": 32.0,
+        "method_verified": false,
+        "equipment_calibration_verified": false,
+        "remarks": "Synthetic training data; do not issue."
+      },
+      "TDAC_LL_R2_MIN": 0.95,
+      "liquid_limit": {
+        "TDAC_LL_TRIALS": [
+          {"TDAC_BLOW_COUNT": 15, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 34.766218},
+          {"TDAC_BLOW_COUNT": 20, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 34.616292},
+          {"TDAC_BLOW_COUNT": 28, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 34.441162},
+          {"TDAC_BLOW_COUNT": 35, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 34.324647}
+        ]
+      },
+      "plastic_limit": {
+        "TDAC_NON_PLASTIC": false,
+        "TDAC_PL_RANGE_TOLERANCE_PCT": 1.0,
+        "TDAC_PL_TRIALS": [
+          {"TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 32.42},
+          {"TDAC_CONTAINER_G": 21, "TDAC_CONTAINER_DRY_G": 31, "TDAC_CONTAINER_WET_G": 33.48}
+        ]
+      }
+    },
+    {
+      "standard_profile": "ISO_17892_12_2018_A1_2021_A2_2022",
+      "liquid_limit_method": "fall_cone",
+      "metadata": {
+        "PROJ_ID": "TRAINING-ONLY",
+        "LOCA_ID": "DEMO-BH",
+        "SAMP_TOP": 4.0,
+        "SAMP_BASE": 4.5,
+        "SAMP_REF": "DEMO-S2",
+        "SPEC_REF": "DEMO-AL2",
+        "TEST_DATE": "2026-10-10",
+        "method_verified": false,
+        "equipment_calibration_verified": false,
+        "remarks": "Synthetic training data. Reference penetration must come from the controlled cone method."
+      },
+      "TDAC_LL_R2_MIN": 0.95,
+      "liquid_limit": {
+        "TDAC_REFERENCE_PENETRATION_MM": 20.0,
+        "TDAC_CONE_MASS_G": 80.0,
+        "TDAC_CONE_ANGLE_DEG": 30.0,
+        "TDAC_LL_TRIALS": [
+          {"TDAC_PENETRATION_MM": 14, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 34.322549},
+          {"TDAC_PENETRATION_MM": 18, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 34.747677},
+          {"TDAC_PENETRATION_MM": 23, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 35.173416},
+          {"TDAC_PENETRATION_MM": 28, "TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 35.515240}
+        ]
+      },
+      "plastic_limit": {
+        "TDAC_NON_PLASTIC": false,
+        "TDAC_PL_RANGE_TOLERANCE_PCT": 1.0,
+        "TDAC_PL_TRIALS": [
+          {"TDAC_CONTAINER_G": 20, "TDAC_CONTAINER_DRY_G": 30, "TDAC_CONTAINER_WET_G": 32.80},
+          {"TDAC_CONTAINER_G": 21, "TDAC_CONTAINER_DRY_G": 31, "TDAC_CONTAINER_WET_G": 33.75}
+        ]
+      }
+    }
+  ]
+}

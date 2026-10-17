@@ -1,0 +1,139 @@
+/* TDAC AGS Console — design tokens & base.
+   Engineering-console system: crisp slate on white, semantic color only. */
+
+:root {
+  /* Surfaces */
+  --bg: #F4F6FA;
+  --surface: #FFFFFF;
+  --surface-2: #EDF1F7;
+
+  /* Ink */
+  --ink: #0E1726;
+  --ink-2: #4A5872;
+  --ink-3: #8492A9;
+
+  /* Structure */
+  --line: #DDE4EE;
+  --focus-ring: #0F8B83; /* teal for tab focus, when mouse is absent and control with keyboard */
+
+  /* Accent — actions only */
+  /* --accent focus on buttons,links etc. --accent-hover is the hover state for those elements. --accent-soft is used for selection and other soft accents. */
+  --accent: #0F8B83;
+  --accent-hover: #0C6F68;
+  --accent-soft: #E6F5F3;
+
+  /* Semantic — green=pass/new, red=fail, amber=warning */
+  --ok: #177E4C;
+  --ok-bg: #E7F6EE;
+  --warn: #9A6A1B;
+  --warn-bg: #FBF1DF;
+  --err: #C03B3B;
+  --err-bg: #FBECEC;
+
+  /* Button roles. Yellow is action colour, not the amber warning tone: on a
+     solid fill, amber (#9A6A1B) reads as brown beside the red. Each value is
+     dark enough to carry white text at a readable contrast, which is why
+     these are their own tokens rather than pure hue channels. */
+  --yellow: #C99700;
+  --yellow-hover: #A87F00;
+  --ok-hover: #12663D;
+  --err-hover: #A32F2F;
+  --new-bg: #EFFBF3;
+  --new-bar: #177E4C;
+  --info: #2B6588;
+  --info-bg: #E5EFF8;
+
+  /* Sidebar */
+  --sidebar: #102F37;
+  --sidebar-ink: #C7D3E4;
+  --sidebar-ink-2: #6B7C95;
+  --sidebar-line: rgba(199, 211, 228, 0.1);
+  --sidebar-hover: rgba(199, 211, 228, 0.08);
+  --sidebar-active: #194854;
+
+  /* Type */
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Rhythm */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --shadow-card: 0 1px 2px rgba(14, 23, 38, 0.05), 0 1px 3px rgba(14, 23, 38, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button {
+  font-family: inherit;
+}
+
+code,
+.mono,
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Calm slate scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 5px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

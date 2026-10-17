@@ -1,0 +1,20 @@
+name: no-junk-files
+on: [push, pull_request]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if waste files are tracked
+        run: |
+          bad=$(git ls-files | grep -Ei '\.py[co]$|__pycache__|(^|/)venv/|node_modules/|(^|/)dist/|\.coverage$|\.pytest_cache/' || true)
+          # Env files are matched separately so the committed template is
+          # allowed. "(^|/)\.env" also matched client/.env.example, which is a
+          # placeholder file with no secrets in it, and that false positive
+          # failed every push including the one that added it.
+          envs=$(git ls-files | grep -Ei '(^|/)\.env' | grep -Ev '\.env\.example$' || true)
+          if [ -n "$bad" ] || [ -n "$envs" ]; then
+            echo "::error::Waste files tracked in git:"
+            printf '%s\n%s\n' "$bad" "$envs"
+            exit 1
+          fi

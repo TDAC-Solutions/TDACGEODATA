@@ -1,0 +1,43 @@
+{
+  "tests": [
+    {
+      "standard_profile": "IS_2720_3_SEC1_1980",
+      "method": "fluid_pycnometer",
+      "metadata": {
+        "PROJ_ID": "TRAINING-ONLY",
+        "LOCA_ID": "DEMO-BH",
+        "SAMP_TOP": 2.0,
+        "SAMP_BASE": 2.5,
+        "SAMP_REF": "DEMO-S1",
+        "SAMP_TYPE": "DS",
+        "SPEC_REF": "DEMO-GS1",
+        "TEST_DATE": "2026-10-10",
+        "method_verified": false,
+        "equipment_calibration_verified": false,
+        "remarks": "Synthetic training data; do not issue."
+      },
+      "TDAC_TOLERANCE_BASIS": "specific_gravity",
+      "TDAC_REPLICATE_TOLERANCE": 0.03,
+      "trials": [
+        {
+          "TDAC_M1_EMPTY_PYCNOMETER_G": 50.000,
+          "TDAC_M2_PYC_DRY_SOIL_G": 75.000,
+          "TDAC_M3_PYC_SOIL_FLUID_G": 165.300,
+          "TDAC_M4_PYC_FLUID_G": 150.000,
+          "TDAC_TEMPERATURE_C": 27.0,
+          "TDAC_FLUID_DENSITY_KG_M3": 996.5,
+          "TDAC_REFERENCE_WATER_DENSITY_KG_M3": 996.5
+        },
+        {
+          "TDAC_M1_EMPTY_PYCNOMETER_G": 50.000,
+          "TDAC_M2_PYC_DRY_SOIL_G": 75.200,
+          "TDAC_M3_PYC_SOIL_FLUID_G": 165.440,
+          "TDAC_M4_PYC_FLUID_G": 150.000,
+          "TDAC_TEMPERATURE_C": 27.0,
+          "TDAC_FLUID_DENSITY_KG_M3": 996.5,
+          "TDAC_REFERENCE_WATER_DENSITY_KG_M3": 996.5
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5616 @@
+/* TDAC AGS Console — shell & shared components (engineering-console system).
+   Only the styles needed by the current routes (Company Home shell, table,
+   buttons, chips, account menu, modals) live here. */
+
+@keyframes modal-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Layout */
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.shell-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.shell-content {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+  width: 100%;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 232px;
+  flex: 0 0 232px;
+  background: linear-gradient(180deg, var(--sidebar), #0b242b);
+  color: var(--sidebar-ink);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 30;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--sidebar-line);
+}
+
+.sidebar-brand-mark {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #0B5CD6, #1E7BE8);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-brand-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #F4F7FB;
+  line-height: 1.2;
+}
+
+.sidebar-brand-sub {
+  font-size: 10.5px;
+  color: var(--sidebar-ink-2);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-section {
+  margin: 12px 8px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sidebar-ink-2);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--sidebar-ink);
+  text-decoration: none;
+  font-size: 13.5px;
+  line-height: 1;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.nav-item svg {
+  flex: 0 0 16px;
+}
+
+.nav-item:hover {
+  background: var(--sidebar-hover);
+  color: #ffffff;
+}
+
+.nav-item.active {
+  background: var(--sidebar-active);
+  color: #ffffff;
+}
+
+.sidebar-footer {
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--sidebar-line);
+  font-size: 11px;
+  color: var(--sidebar-ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Topbar */
+.topbar {
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 22px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topbar-title {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ink-3);
+  margin: 0;
+  /* A long project title must not shove the account menu off the right
+     edge, so it truncates and .topbar-right keeps its width. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.topbar-title b {
+  color: var(--ink);
+}
+/* The search box is a <form> so Enter submits; the classes live on the
+   form, so the visual styling belongs on the inner input. */
+.topbar .topbar-search{
+  width: 260px;
+  max-width: 260px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 10px 10px;
+  font-size: 14px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Never let a long title squeeze the account menu out of view. */
+  flex-shrink: 0;
+}
+
+.topbar-right .chip-muted {
+  padding: 4px 10px;
+  font-weight: 400;
+  font-size: 12px;
+  border:0px;
+}
+
+/* Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  border: none;
+}
+
+.chip-ok {
+  background: var(--ok-bg);
+  /* Text is ink, not --ok: the green fill already carries the "pass"
+     reading, and green-on-green left the label hard to read at pill
+     size. The border keeps the semantic colour cue. */
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ok) 25%, transparent);
+}
+
+.chip-err {
+  background: var(--err-bg);
+  color: var(--err);
+  border-color: color-mix(in srgb, var(--err) 25%, transparent);
+}
+
+.chip-warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 25%, transparent);
+}
+
+.chip-accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.chip-muted {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.chip-info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+/* Page header */
+.page-title {
+  margin: 2px 0 4px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.page-sub {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  max-width: 1100px;
+}
+
+/* Panels */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  /* min-width: 0 lets this flex/grid child shrink below its content. Left at
+     the default min-width: auto, a wide table inside would push the whole
+     page sideways instead of scrolling inside .table-scroll. */
+  min-width: 0;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.panel-body {
+  padding: 16px;
+  min-width: 0;
+}
+
+/* Search */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 6px 6px 14px;
+  width: 100%;
+  max-width: 420px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.btn:hover {
+  background: var(--surface-2);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-2);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* Solid fills, matching how the primary button reads, so a coloured action
+   carries the same visual weight as the action it performs. Text colours are
+   fixed hex per role: each token is dark enough for white text, so the
+   contrast is deliberate rather than incidental. */
+
+/* Destructive: Delete a record, Remove a row. Red means gone. */
+.btn-danger {
+  background: var(--err);
+  border-color: var(--err);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background: var(--err-hover);
+  border-color: var(--err-hover);
+}
+
+/* Edit a record. Green: the record survives the action. */
+.btn-edit {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #ffffff;
+}
+
+.btn-edit:hover {
+  background: var(--ok-hover);
+  border-color: var(--ok-hover);
+}
+
+/* Clear a row. Yellow: nothing stored is lost, so it is a caution rather
+   than a loss. Amber would have read as brown next to the red, which is why
+   this uses a yellow with real chroma. */
+.btn-warn {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: #ffffff;
+}
+
+.btn-warn:hover {
+  background: var(--yellow-hover);
+  border-color: var(--yellow-hover);
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 13px;
+  max-width: 52ch;
+}
+
+/* Dense data tables (explorer / review) */
+.dtable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.dtable thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.dtable tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.dtable tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.dtable .num {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.dtable .cell-dim {
+  color: var(--ink-3);
+}
+
+.dtable td:has(input) {
+  overflow: visible;
+  white-space: normal;
+}
+
+/* Mobile: sidebar becomes a compact top rail */
+@media (max-width: 760px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    padding: 8px 10px;
+    gap: 4px;
+  }
+
+  .sidebar-brand {
+    border-bottom: 0;
+    padding: 0 6px 0 2px;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    padding: 0;
+    gap: 4px;
+  }
+
+  .nav-section,
+  .sidebar-footer {
+    display: none;
+  }
+
+  .nav-item {
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 7px 10px;
+  }
+
+  .shell-content {
+    padding: 16px;
+  }
+
+  .topbar {
+    padding: 0 16px;
+  }
+}
+
+/* Page head */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.page-head .page-title {
+  margin-bottom: 2px;
+}
+
+.page-head .page-sub {
+  margin-bottom: 0;
+}
+
+/* Topbar user */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.topbar-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 10px;
+  border-left: 1px solid var(--line);
+}
+
+.topbar-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (max-width: 760px) {
+  .topbar-user-name,
+  .topbar-right > .chip:first-child {
+    display: none;
+  }
+}
+
+/* Modals (shared shell for future dialogs) */
+.modal-input {
+  width: 100%;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.modal-input.input-error {
+  border-color: var(--err);
+}
+
+.modal-input.input-error:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--err) 25%, transparent);
+}
+
+.modal-input:disabled {
+  background: var(--surface-2, var(--surface));
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+.field-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--err);
+}
+
+.field-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* Modal shell (overlay + box, used by page dialogs) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 30, 35, 0.45);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-box {
+  background: var(--surface);
+  width: min(820px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  padding: 18px;
+  animation: modal-in 120ms ease-out;
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-title {
+  margin: 2px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal-note {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.modal-field label {
+  display: block;
+  color: var(--ink-2);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.modal-actions {
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .modal-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Account menu (Topbar) */
+.account-menu {
+  position: relative;
+}
+
+.account-trigger {
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 4px 8px;
+}
+
+.account-trigger:hover {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 190px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 4px;
+  z-index: 60;
+  animation: modal-in 120ms ease-out;
+}
+
+.account-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.account-item:hover {
+  background: var(--surface-2);
+}
+
+.account-item-danger {
+  color: var(--err);
+}
+
+.account-item-danger:hover {
+  background: var(--err-bg);
+}
+
+/* Password change form (Topbar account menu modal) */
+.pw-form .warning-note {
+  margin: 0 0 4px 0;
+}
+
+.pw-form label {
+  display: block;
+}
+
+.pw-form .modal-input {
+  width: 100%;
+  margin: 6px 0 14px 0;
+}
+
+.pw-match {
+  min-height: 18px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pw-match-ok {
+  color: var(--ok);
+}
+
+.pw-match-err {
+  color: var(--err);
+}
+
+.pw-success {
+  margin: 0;
+  padding: 14px;
+  background: var(--ok-bg);
+  border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  border-radius: var(--radius-md);
+  color: var(--ok);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* the below hides the search bar and help button when the screen width becomes below the mentioned. it has to be updated once connected with the backend */
+@media (max-width: 900px){
+  .topbar-search{
+    display: none;
+  }
+}
+
+@media (max-width: 600px){
+  .topbar .btn{
+    display: none;
+  }
+  .topbar-user-name {
+    display: none;
+  }
+}
+
+/* portfolio centre */
+.grid {
+  display: grid;
+  gap: 13px;
+}
+
+.grid > .panel {
+  min-width: none;
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.grid-23 {
+  grid-template-columns: 2fr 1fr;
+}
+.metric-num {
+  font-size: 27px;
+  font-weight: 850;
+  margin: 2px 0;
+}
+.eyebrow {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.metric small {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.stat-mini {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.stat-mini td {
+  padding: 8px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.stat-mini td:last-child {
+  color: var(--ink);
+}
+
+.warning-note {
+  padding: 10px 12px;
+  border-left: 4px solid var(--warn);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+/* Success-tone companion to .warning-note for import confirmations */
+.import-note {
+  padding: 10px 12px;
+  border-left: 4px solid var(--ok);
+  background: var(--ok-bg);
+  color: var(--ok);
+  font-size: 13px;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+/* Row of actions inside a page head (Import + Cancel) */
+.page-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Chosen-workbook chip shown by SpreadsheetFilePicker after a successful parse */
+.excel-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: 999px;
+  max-width: 320px;
+}
+
+.excel-file-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-hover);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excel-file-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--accent-hover);
+  cursor: pointer;
+}
+
+.excel-file-remove:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.grid + .grid {
+  margin-top: 13px;
+}
+
+.panel-head {
+  flex-wrap: wrap;
+}
+.panel-head.no-divider {
+  border-bottom: none;
+}
+
+.panel-head.no-divider + .panel-body {
+  padding-top: 0px;
+}
+
+.panel-head .search {
+  width: 280px;
+  max-width: 280px;
+  flex: 0 0 auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.register-table {
+  font-size: 13px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  /* The one container allowed to scroll sideways: everything that can hold
+     a wide table must shrink first, so the scroll lands here rather than
+     on the whole page. */
+  width: 100%;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.register-table thead th {
+  text-transform: none;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.register-table tbody tr:hover {
+  background: var(--accent-soft);
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+  padding: 20px 8px;
+}
+
+.login-page{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.login-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+@media (max-width: 900px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-23 {
+    grid-template-columns: 1fr;
+  } 
+}
+.form-field label {
+  display: block;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.form-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+/* Login page (pages/Login.tsx) */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.login-panel {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 32px 28px;
+}
+
+.login-heading b {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.login-heading h1 {
+  margin: 6px 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.login-heading p {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.login-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-panel form label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.login-panel form input {
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.login-panel form input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.login-error {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--err) 30%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--err-bg);
+  color: var(--err);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.login-panel form button {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.login-panel form button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.login-panel form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Project Workspace (pages/ProjectWorkspace.tsx) */
+.projectbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 13px 15px;
+  margin-bottom: 12px;
+}
+
+.projectbar-title {
+  margin: 2px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.projectbar-meta {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Same reasoning as .modebar: one scrollable line of tabs, and the strip
+     itself must be allowed to shrink inside the panel. */
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.tab {
+  padding: 12px 16px;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.3;
+  /* Without this a tab can be squeezed narrower than its label and the
+     text starts breaking mid-word. */
+  flex: 0 0 auto;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab.active {
+  color: var(--accent);
+  font-weight: 700;
+  border-color: var(--accent);
+}
+
+.tab-badge {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.field-layout {
+  display: grid;
+  /* minmax(0, 1fr) rather than a bare 1fr: a 1fr track floors at its
+     content's min-content width, so a wide table in the second column
+     would drag the whole grid wider than the page. No !important, so the
+     900px media query below can still collapse this to one column. */
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+/* The content column, not the grid, is what has to absorb a wide table. */
+.field-layout > div:last-child {
+  min-width: 0;
+}
+
+.catalog {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.catalog .item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink-2);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.catalog .item:hover,
+.catalog .item.active {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+.catalog .item.active {
+  border-color: var(--accent);
+}
+
+.modebar {
+  display: flex;
+  gap: 8px;
+  /* nowrap + overflow-x is what keeps the five Field Module buttons on one
+     scrollable line. With flex-wrap: wrap they stack instead, which grows
+     the bar vertically and, because the buttons are wide, can still push
+     the row wider than its parent. */
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: center;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  min-width: 0;
+}
+
+.modebar b {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-right: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mode {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink);
+  /* A label must not wrap mid-word inside a single-line scroll row. */
+  white-space: nowrap;
+  flex: 0 0 auto;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.mode:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.mode.active {
+  background: var(--sidebar);
+  color: #ffffff;
+  border-color: var(--sidebar);
+}
+
+.modebar-spacer {
+  flex: 1;
+}
+
+.module-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.panel-subtitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* SPT entry grid, shown inline inside the SPT tab. Kept inline rather than
+   in a dialog so a long borehole log stays in the same scroll context as
+   the records table it feeds. */
+.spt-entry-panel {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.spt-entry-grid .table-scroll {
+  max-height: 46vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.spt-entry-grid .modal-input {
+  min-width: 74px;
+}
+
+.spt-entry-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .spt-entry-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.add-record-form {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.add-record-form .form-grid {
+  margin-top: 0;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.viewgrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 13px;
+  margin-top: 13px;
+  align-items: start;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 16px;
+  margin-top: 13px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* A label inside a data-entry form is a field name, not a section
+   heading, so it does not get the teal accent .eyebrow normally paints.
+   Scoped to the form containers rather than .eyebrow itself, so headings
+   elsewhere (Add Location modal, Field Audit, Home) keep the accent. */
+.add-record-form .eyebrow,
+.form-grid .eyebrow,
+.form-field .eyebrow,
+.lab-test-form-field .eyebrow,
+.pw-form .eyebrow,
+.overview-edit-fields .eyebrow {
+  color: var(--ink-2);
+}
+
+.form-grid input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.subtabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.subtab {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.subtab.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+.plotbox {
+  height: 390px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-plot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.info-note {
+  padding: 10px 12px;
+  border-left: 4px solid var(--info);
+  background: var(--info-bg);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  color: var(--info);
+  margin: 10px 0 0;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-32 {
+  grid-template-columns: 1fr 2fr;
+}
+
+.report-paper {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+  padding: 18px;
+  min-height: 340px;
+}
+
+.report-title {
+  text-align: center;
+  border-bottom: 2px solid var(--ink-2);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.report-title b {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.paper-sub {
+  color: var(--ink-3);
+  font-size: 11.5px;
+}
+
+.paper-plot {
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.paper-note {
+  margin: 10px 0 0;
+  color: var(--ink-3);
+  font-size: 11.5px;
+}
+
+.statgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.stat {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+}
+
+.stat small {
+  color: var(--ink-3);
+  font-size: 11px;
+}
+
+.stat b {
+  display: block;
+  font-size: 16px;
+  color: var(--ink);
+  margin-top: 2px;
+}
+
+.pane-h4 {
+  margin: 14px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.confidence {
+  height: 9px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.confidence span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.module {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: var(--surface);
+}
+
+.module b {
+  display: block;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.module small {
+  display: block;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  margin-top: 3px;
+}
+
+.module.future {
+  border: 1px dashed var(--ink-3);
+  background: var(--bg);
+}
+
+.flow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.gate {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 9px 5px;
+  text-align: center;
+  font-size: 11px;
+  background: var(--surface);
+  color: var(--ink-3);
+  position: relative;
+}
+
+.gate b {
+  color: var(--ink);
+}
+/* Add Location Modal */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.modal {
+  width: min(520px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d9dee7);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+}
+
+.modal .panel-head {
+  position: sticky;
+  top: 0;
+  background: var(--surface, #ffffff);
+  border-bottom: 1px solid var(--border, #d9dee7);
+  z-index: 1;
+}
+
+.modal form {
+  margin: 0;
+}
+
+.modal .panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Inputs and selects share one rule on purpose. Styling only the select
+   left the Location ID input next to the Location Type dropdown rendering
+   at browser defaults, so a padded rounded box sat flush against a thin
+   unstyled one in the same row.
+
+   line-height is pinned because form controls do not inherit it the way
+   ordinary elements do: the body's 1.5 reached the input but not the select,
+   which left the dropdown 3px shorter than the field beside it. */
+.modal input,
+.modal select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  height: 41px;
+  color: inherit;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, #d1d5db);
+  border-radius: var(--radius-md, 8px);
+}
+
+.modal input:focus,
+.modal select:focus {
+  outline: none;
+  border-color: var(--focus-ring, #0f8b83);
+  box-shadow: 0 0 0 3px var(--accent-soft, #e6f5f3);
+}
+
+.modal select {
+  cursor: pointer;
+}
+
+/* Modal field labels read as labels, not as accents. .eyebrow paints every
+   label in the app with the teal accent, which in a form this dense made
+   eleven green labels compete with the section headings for attention. The
+   weight and letter-spacing stay so the label hierarchy survives; only the
+   colour is neutralised, and only inside a modal. */
+.modal .eyebrow {
+  color: var(--ink-2, #4a5872);
+}
+
+/* The Add Location modal carries identity, drilling, surface and coordinate
+   groups. The default 520px single column makes those pairs of fields
+   crawl, so it gets the room the layout needs. */
+.modal-wide {
+  width: min(720px, 100%);
+}
+
+/* Section heading between the modal's field groups. */
+.modal-group {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent, #0f8b83);
+  margin: 18px 0 7px;
+}
+
+.modal-group:first-child {
+  margin-top: 0;
+}
+
+.modal .actions {
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+@media (max-width: 900px) {
+  .field-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .catalog .item {
+    white-space: nowrap;
+  }
+
+  .viewgrid,
+  .grid-2,
+  .grid-3,
+  .grid-32,
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .module-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flow {
+    grid-template-columns: 1fr;
+  }
+}
+/* Modal form fields */
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  height: 42px;
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.form-field input::placeholder {
+  color: #9ca3af;
+}
+
+.form-field input:hover,
+.form-field select:hover {
+  border-color: #9ca3af;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.field-error {
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* Compact Project Overview */
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+
+.overview-section {
+  border: 1px solid var(--border, #d9e0e5);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.overview-section-wide {
+  grid-column: 1 / -1;
+}
+
+.overview-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  color: var(--muted, #667085);
+}
+
+.overview-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 18px;
+}
+
+.overview-fields-five {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Three-up, for the Investigation Summary metrics. A 4-column track
+   would leave an empty fourth cell beside three figures. */
+.overview-fields-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.overview-fields > div {
+  min-width: 0;
+}
+
+.overview-fields span {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #667085);
+  margin-bottom: 2px;
+}
+
+.overview-fields strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 500;
+  color: var(--text, #1f2933);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-section-wide {
+    grid-column: auto;
+  }
+
+  .overview-fields-five,
+  .overview-fields-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .overview-fields,
+  .overview-fields-five,
+  .overview-fields-three {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Edit-mode overview form.
+
+   The controls used to carry no padding, border or radius of their own, so
+   input, select and textarea each fell back to browser defaults and the
+   three rendered at different heights. One rule for all three fixes that,
+   and the focus ring matches the rest of the app. */
+.overview-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.overview-edit-grid .overview-section-wide {
+  grid-column: 1 / -1;
+}
+
+.overview-edit-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.overview-edit-fields-five {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.overview-edit-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.overview-edit-fields label span {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted, #667085);
+}
+
+.overview-edit-fields input,
+.overview-edit-fields select,
+.overview-edit-fields textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  min-height: 36px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.overview-edit-fields input:focus,
+.overview-edit-fields select:focus,
+.overview-edit-fields textarea:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Project ID is shown but not editable, so it has to read as disabled
+   rather than looking like a field that simply refuses the keyboard. */
+.overview-edit-fields input:disabled {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+.overview-edit-fields textarea {
+  resize: vertical;
+  min-height: 68px;
+  font-family: inherit;
+}
+
+/* Edit sections carry controls rather than text, so the box needs more
+   padding than the read view, and the rule under the title groups the
+   fields without adding another heading level. */
+.overview-edit-grid .overview-section {
+  padding: 14px 16px;
+}
+
+.overview-edit-grid .overview-section-title {
+  font-size: 11.5px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  .overview-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-edit-grid .overview-section-wide {
+    grid-column: auto;
+  }
+
+  .overview-edit-fields-five {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .overview-edit-fields,
+  .overview-edit-fields-five {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+   BOREHOLE / DRILLING
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Scrollable records table
+   --------------------------------------------------------- */
+
+.borehole-records-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: auto;
+
+  border: 1px solid var(--border, #d9e0e5);
+  border-radius: 8px;
+
+  background: #ffffff;
+}
+
+/* Keep the table header visible while scrolling */
+.borehole-records-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  background: #eef3f7;
+}
+
+/* Prevent the table from becoming excessively compressed */
+.borehole-records-scroll table {
+  min-width: 760px;
+  margin: 0;
+}
+
+/* =========================================================
+   BOREHOLE / SOIL PROFILE
+   ========================================================= */
+
+.borehole-profile-panel {
+  margin-top: 14px;
+  padding: 14px;
+
+  border: 1px solid var(--border, #d9e0e5);
+  border-radius: 8px;
+
+  background: #ffffff;
+}
+
+/* ---------------------------------------------------------
+   Profile header
+   --------------------------------------------------------- */
+
+.borehole-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.borehole-profile-header .panel-subtitle {
+  margin: 0 0 3px;
+}
+
+.borehole-profile-header .page-sub {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   Total depth indicator
+   --------------------------------------------------------- */
+
+.profile-depth-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  color: var(--muted, #667085);
+}
+
+.profile-depth-summary strong {
+  margin-top: 2px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: var(--text, #1f2933);
+}
+
+/* =========================================================
+   PROFILE CHART
+   ========================================================= */
+
+.borehole-profile-chart {
+  display: grid;
+
+  grid-template-columns: 70px minmax(0, 1fr);
+
+  /*
+   * Fixed visual height.
+   * Depth itself is proportional inside this area.
+   */
+  height: 520px;
+
+  border: 1px solid var(--border, #d9e0e5);
+  border-radius: 7px;
+
+  overflow: hidden;
+
+  background: #f8fafb;
+}
+
+/* =========================================================
+   DEPTH SCALE
+   ========================================================= */
+
+.profile-scale {
+  position: relative;
+
+  border-right: 1px solid #cbd5dc;
+
+  background: #f7f9fa;
+}
+
+.profile-scale-title {
+  position: absolute;
+
+  top: 9px;
+  left: 0;
+
+  width: 100%;
+
+  text-align: center;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  color: #344054;
+
+  z-index: 10;
+}
+
+.profile-scale-title span {
+  display: block;
+
+  margin-top: 1px;
+
+  font-size: 9px;
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------
+   Individual depth tick
+   --------------------------------------------------------- */
+
+.profile-scale-tick {
+  position: absolute;
+
+  left: 0;
+
+  width: 100%;
+  height: 1px;
+
+  transform: translateY(-50%);
+}
+
+/* Depth number */
+.profile-scale-tick span {
+  position: absolute;
+
+  left: 0;
+
+  width: 42px;
+
+  text-align: right;
+
+  transform: translateY(-50%);
+
+  font-size: 9px;
+  font-weight: 600;
+
+  color: #475467;
+}
+
+/* Tick line */
+.profile-scale-tick i {
+  position: absolute;
+
+  right: 0;
+
+  width: 16px;
+  height: 1px;
+
+  background: #475467;
+}
+
+/* =========================================================
+   STRATIGRAPHIC PROFILE AREA
+   ========================================================= */
+
+.profile-strata {
+  position: relative;
+
+  min-width: 0;
+  height: 100%;
+
+  overflow: hidden;
+
+  /*
+   * Fine horizontal grid lines help visually read depth.
+   */
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(71, 85, 105, 0.08) 0,
+      rgba(71, 85, 105, 0.08) 1px,
+      transparent 1px,
+      transparent 20px
+    );
+}
+
+/* =========================================================
+   GEOLOGICAL LAYERS
+   ========================================================= */
+
+.profile-layer {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  box-sizing: border-box;
+
+  border-top: 1px solid rgba(31, 41, 55, 0.28);
+  border-bottom: 1px solid rgba(31, 41, 55, 0.28);
+
+  overflow: hidden;
+
+  transition:
+    filter 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.profile-layer:hover {
+  filter: brightness(0.97);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(31, 41, 55, 0.18);
+}
+
+/* =========================================================
+   LAYER CONTENT
+   ========================================================= */
+
+.profile-layer-content {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 6px 14px;
+
+  box-sizing: border-box;
+}
+
+.profile-layer-content strong {
+  font-size: 11px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  color: #17212b;
+
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------
+   Depth interval shown inside layer
+   --------------------------------------------------------- */
+
+.profile-layer-depth {
+  flex: 0 0 auto;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  color: #344054;
+}
+
+/* ---------------------------------------------------------
+   Material badge
+   --------------------------------------------------------- */
+
+.profile-material {
+  margin-left: auto;
+
+  flex: 0 0 auto;
+
+  padding: 3px 9px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.82);
+
+  border: 1px solid rgba(31, 41, 55, 0.12);
+
+  font-size: 8px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  color: #344054;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DISTINCT SOIL / ROCK COLOURS
+   ========================================================= */
+
+/*
+ * Layer 0 — Fill / Sand
+ */
+.profile-layer-0 {
+  background-color: #f5d77a;
+
+  background-image:
+    radial-gradient(
+      rgba(130, 92, 20, 0.25) 1px,
+      transparent 1px
+    );
+
+  background-size: 9px 9px;
+}
+
+/*
+ * Layer 1 — Clay
+ */
+.profile-layer-1 {
+  background-color: #6fc4e5;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 7px,
+      rgba(20, 90, 120, 0.14) 8px
+    );
+}
+
+/*
+ * Layer 2 — Silt
+ */
+.profile-layer-2 {
+  background-color: #dcbc8f;
+
+  background-image:
+    radial-gradient(
+      rgba(120, 82, 35, 0.22) 1px,
+      transparent 1px
+    );
+
+  background-size: 8px 8px;
+}
+
+/*
+ * Layer 3 — Weathered rock
+ */
+.profile-layer-3 {
+  background-color: #9fc9a9;
+
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(45, 100, 55, 0.12) 9px
+    );
+}
+
+/*
+ * Layer 4 — Highly weathered rock
+ */
+.profile-layer-4 {
+  background-color: #c7b2e3;
+
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 9px,
+      rgba(80, 50, 110, 0.13) 10px
+    );
+}
+
+/*
+ * Layer 5 — Slightly / moderately weathered rock
+ */
+.profile-layer-5 {
+  background-color: #aeb7bf;
+
+  background-image:
+    radial-gradient(
+      rgba(55, 65, 75, 0.22) 1px,
+      transparent 1px
+    );
+
+  background-size: 10px 10px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .borehole-profile-chart {
+    grid-template-columns: 52px minmax(0, 1fr);
+
+    height: 440px;
+  }
+
+  .profile-layer-content {
+    gap: 6px;
+
+    padding: 5px 8px;
+  }
+
+  .profile-layer-depth {
+    display: none;
+  }
+
+  .profile-layer-content strong {
+    font-size: 10px;
+  }
+
+  .profile-material {
+    padding: 2px 6px;
+
+    font-size: 7px;
+  }
+}
+
+.sampling-view-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.sampling-view-tab {
+  padding: 8px 18px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+}
+
+.sampling-view-tab.active {
+  background: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #333;
+}
+
+
+
+
+/* =========================================================
+   LAB DATA — unified with the shared workspace language
+   =========================================================
+   LabData grew its own visual language before the shared shell had
+   a stable system, so its cards, tab strip and tables looked like a
+   different product from Overview and Field Data. This block binds
+   those existing class names to the same tokens the rest of the
+   workspace uses, so nothing in the JSX needed changing.
+
+   The genuinely unique pieces are kept as they were: the workflow
+   stepper, the flow-curve chart, the completion bars, the e-log chart
+   and the multi-select test type rows. Those were correctly different.
+   Everything that merely duplicated a shared component is now expressed
+   in shared tokens.
+
+   This block also absorbs what used to live in
+   LabData/tabs/ResultsEntryTab.css, so there is one stylesheet rather
+   than two competing visual languages in the same tab.
+*/
+
+/* ---------- Card -> panel ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- Sub-tab strip -> shared .tabs ---------- */
+.lab-data-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+  overflow-x: auto;
+  /* Setting one axis to a non-visible value forces the other off `visible`, so
+     the 1px the active tab's 3px underline overlaps used to surface as a tiny
+     vertical scrollbar under the strip. Nothing here is taller than one row of
+     tabs, so clip it and keep the sideways scroll, which is the one that is
+     actually needed on narrow screens. */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap;
+  min-width: 0;
+  padding: 0;
+}
+
+.lab-data-tab {
+  padding: 12px 16px;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.3;
+  flex: 0 0 auto;
+  border-radius: 0;
+}
+
+.lab-data-tab:hover {
+  color: var(--ink);
+}
+
+.lab-data-tab.active {
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+  border-bottom: 3px solid var(--accent);
+  margin-bottom: -1px;
+}
+
+.lab-data-tab-content {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ---------- Lab Overview tab ---------- */
+.lab-overview {
+  width: 100%;
+}
+
+.lab-overview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.lab-overview-header h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lab-overview-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Refresh / Add take the shared button shape instead of their own. */
+.lab-overview-refresh-button,
+.lab-overview-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.lab-overview-refresh-button:hover {
+  background: var(--surface-2);
+}
+
+.lab-overview-add-button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.lab-overview-add-button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.lab-overview-refresh-button:disabled,
+.lab-overview-add-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lab-overview-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+  margin-bottom: 16px;
+}
+
+.lab-overview-summary .card {
+  padding: 14px 16px;
+  min-height: 90px;
+}
+
+.lab-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+  margin-bottom: 13px;
+}
+
+.lab-overview h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lab-summary-label {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.lab-summary-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+@media (max-width: 900px) {
+  .lab-overview-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lab-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .lab-overview-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-overview-actions {
+    width: 100%;
+  }
+
+  .lab-overview-actions button {
+    flex: 1 1 0;
+  }
+}
+
+/* ---------- Status pills on the work queue ----------
+   These were rendered by OverviewTab but had no rule anywhere in the
+   project, so every status showed as unstyled text. Bound here to the
+   shared chip tones. */
+.lab-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.lab-status-approved,
+.lab-status-published {
+  background: var(--ok-bg);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ok) 25%, transparent);
+}
+
+.lab-status-submitted,
+.lab-status-checked {
+  background: var(--info-bg);
+  color: var(--info);
+  border-color: color-mix(in srgb, var(--info) 25%, transparent);
+}
+
+.lab-status-draft,
+.lab-status-calculated {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 25%, transparent);
+}
+
+.lab-status-rejected {
+  background: var(--err-bg);
+  color: var(--err);
+  border-color: color-mix(in srgb, var(--err) 25%, transparent);
+}
+
+/* OverviewTab builds the tone from the status value, so any status
+   without a rule below renders as an untinted pill. These three are
+   reachable from the workflow: RETURNED comes from the QA return
+   action, SUPERSEDED and VOID from lifecycle handling. */
+.lab-status-returned {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 25%, transparent);
+}
+
+.lab-status-superseded,
+.lab-status-void {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border-color: var(--line);
+}
+
+/* ---------- Lab tables -> shared dtable ---------- */
+.lab-work-table-wrap {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.lab-work-table,
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.lab-work-table thead th,
+.results-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.lab-work-table tbody td,
+.results-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.lab-work-table tbody tr:hover,
+.results-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.results-table td input {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 9px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+.results-table td input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.results-table .calculated-cell {
+  color: var(--ink);
+  font-weight: 500;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.lab-sample-primary {
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.lab-sample-secondary {
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.lab-work-action {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lab-work-action:hover {
+  background: var(--surface-2);
+}
+
+/* ---------- Completion bars (unique to LabData) ---------- */
+.lab-completion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.lab-completion-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lab-completion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.lab-completion-header span {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.lab-completion-header strong {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.lab-progress-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.lab-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.lab-completion-percent {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* ---------- Test Register: filters ---------- */
+.lab-register-filters {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr 1.1fr 1.4fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.lab-register-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lab-register-filters label span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+
+.lab-register-filters select,
+.lab-register-filters input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.lab-register-filters select:focus,
+.lab-register-filters input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+@media (max-width: 900px) {
+  .lab-register-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .lab-register-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Test Register: sample groups ---------- */
+.lab-sample-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-top: 16px;
+}
+
+.lab-sample-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.lab-sample-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lab-sample-group-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lab-sample-group-header span {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lab-sample-group .table-scroll {
+  overflow-x: auto;
+}
+
+.lab-sample-group table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.lab-sample-group thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.lab-sample-group tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.lab-sample-group tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.lab-sample-group .button-secondary {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lab-sample-group .button-secondary:hover {
+  background: var(--surface-2);
+}
+
+.lab-sample-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+.lab-sample-empty-icon {
+  margin-bottom: 4px;
+  font-size: 26px;
+  color: var(--ink-3);
+}
+
+.lab-sample-empty h4 {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.lab-sample-empty p {
+  margin: 0;
+  font-size: 13px;
+  max-width: 52ch;
+}
+
+/* ---------- Register Test form ---------- */
+.lab-test-register {
+  width: 100%;
+}
+
+.lab-test-register-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.lab-test-register-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.lab-test-register-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.lab-test-register-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lab-test-register-title p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.lab-test-back-button,
+.lab-test-create-button,
+.lab-test-cancel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lab-test-back-button:hover,
+.lab-test-cancel-button:hover {
+  background: var(--surface-2);
+}
+
+.lab-test-create-button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.lab-test-create-button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.lab-test-create-button:disabled,
+.lab-test-cancel-button:disabled,
+.lab-test-back-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lab-selected-sample,
+.lab-test-details {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.lab-selected-sample-title,
+.lab-test-details-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lab-selected-sample-title-icon,
+.lab-test-details-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.lab-selected-sample-title h4,
+.lab-test-details-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lab-test-details-header p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.lab-selected-sample-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.lab-selected-sample-item {
+  min-width: 0;
+}
+
+.lab-selected-sample-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.lab-selected-sample-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+@media (max-width: 900px) {
+  .lab-selected-sample-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .lab-selected-sample-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lab-test-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.lab-test-form-field {
+  min-width: 0;
+}
+
+.lab-test-form-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+
+.lab-test-required {
+  color: var(--err);
+  margin-left: 3px;
+}
+
+.lab-test-form-field input,
+.lab-test-form-field select {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.lab-test-form-field input:focus,
+.lab-test-form-field select:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.lab-test-form-help {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+
+.lab-test-form-error {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--err);
+  background: var(--err-bg);
+  color: var(--err);
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+.lab-test-form-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  .lab-test-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .lab-test-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lab-test-form-actions button {
+    width: 100%;
+  }
+}
+
+/* Multi-select test type rows - genuinely unique layout, kept. */
+.lab-test-types {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.lab-test-type-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.lab-test-type-row.checked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* A ticked row that would collide with an existing (type, specimen ref).
+   The row itself carries the error border so the problem is visible
+   without reading every row, and the message below it explains why. */
+.lab-test-type-row.collision {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.lab-test-type-collision {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--err);
+  border-radius: 6px;
+  background: var(--err-bg);
+  color: var(--err);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.lab-test-type-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.lab-test-type-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.lab-test-type-row select {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.lab-test-type-row select:disabled {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+.lab-test-types-summary {
+  margin-top: 8px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.lab-existing-tests {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .lab-test-type-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* =========================================================
+   RESULTS ENTRY
+   =========================================================
+   Absorbed from tabs/ResultsEntryTab.css so the tab has one
+   stylesheet instead of two competing languages. */
+
+.results-entry {
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.results-entry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.results-entry-header-left {
+  max-width: 850px;
+  min-width: 0;
+}
+
+.results-entry-eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.results-entry-title {
+  margin: 2px 0 4px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.results-entry-description {
+  max-width: 850px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.results-entry-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.results-entry-actions button {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.results-entry-actions button:hover {
+  background: var(--surface-2);
+}
+
+.results-entry-actions .primary-action {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.results-entry-actions .primary-action:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* Workflow stepper - unique, kept as-is. */
+.results-workflow {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.workflow-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 60px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.workflow-item.active {
+  background: var(--sidebar);
+  border-color: var(--sidebar);
+  color: #ffffff;
+}
+
+.workflow-item.done {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.workflow-item.pending {
+  background: var(--surface-2);
+  border-style: dashed;
+  color: var(--ink-3);
+}
+
+.workflow-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workflow-number {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.workflow-item strong {
+  font-size: 13px;
+}
+
+.workflow-caption {
+  font-size: 11px;
+  line-height: 1.25;
+  opacity: 0.85;
+}
+
+.workflow-item-button {
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+  background: none;
+  color: inherit;
+}
+
+.workflow-item-button:hover {
+  border-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .results-workflow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .results-workflow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- Layout ---------- */
+.results-entry-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.results-entry-layout > * {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .results-entry-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.results-main {
+  min-width: 0;
+}
+
+.catalog-ags {
+  float: right;
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+/* ---------- Cards ---------- */
+.results-card,
+.simple-method-panel,
+.flow-curve-card,
+.reported-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-width: 0;
+}
+
+.results-card {
+  margin-bottom: 13px;
+}
+
+.simple-method-panel {
+  margin-bottom: 13px;
+}
+
+.results-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.results-card-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ags-label {
+  color: var(--info);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.revision-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--info-bg);
+  color: var(--info);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ---------- Consolidation tabs ---------- */
+.consolidation-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 13px;
+}
+
+.consolidation-tabs button {
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.consolidation-tabs button.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+/* ---------- Forms ---------- */
+.identity-grid,
+.method-grid,
+.consolidation-input-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+
+.results-entry input,
+.results-entry select {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.results-entry input:focus,
+.results-entry select:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+@media (max-width: 1200px) {
+  .identity-grid,
+  .method-grid,
+  .consolidation-input-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .identity-grid,
+  .method-grid,
+  .consolidation-input-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Atterberg bottom ---------- */
+.atterberg-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.9fr);
+  gap: 13px;
+  margin-top: 13px;
+}
+
+@media (max-width: 900px) {
+  .atterberg-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+.flow-curve-card h3,
+.reported-card h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.flow-chart {
+  position: relative;
+  height: 300px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.flow-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.flow-line {
+  stroke: var(--info);
+  stroke-width: 3;
+  fill: none;
+}
+
+.flow-point {
+  fill: var(--accent);
+}
+
+.blow-line {
+  stroke: var(--warn);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+.chart-label {
+  fill: var(--warn);
+  font-size: 12px;
+}
+
+.chart-y-label {
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.chart-x-label {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.reported-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.reported-row:last-child {
+  border-bottom: 0;
+}
+
+.reported-row strong {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.classification-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--warn);
+  border-radius: 6px;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.use-button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.use-button.active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.container-cell {
+  color: var(--ink-2);
+}
+
+/* ---------- Consolidation graphs ---------- */
+.consolidation-table {
+  min-width: 900px;
+}
+
+.consolidation-table td input {
+  min-width: 160px;
+}
+
+.graph-panel {
+  padding-top: 6px;
+}
+
+.graph-panel h3,
+.cv-panel h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.elog-chart {
+  height: 320px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.elog-line {
+  position: absolute;
+  width: 70%;
+  height: 3px;
+  top: 68%;
+  left: 12%;
+  transform: rotate(-22deg);
+  transform-origin: left center;
+  background: var(--info);
+}
+
+.graph-summary {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.results-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 13px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.cv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+@media (max-width: 900px) {
+  .cv-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cv-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.cv-card h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.mini-chart {
+  position: relative;
+  height: 140px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mini-line {
+  position: absolute;
+  width: 75%;
+  height: 3px;
+  top: 70%;
+  left: 10%;
+  transform: rotate(-25deg);
+  transform-origin: left center;
+  background: var(--info);
+}
+
+.mini-line.second {
+  top: 55%;
+  transform: rotate(-15deg);
+}
+
+/* ---------- Notices ---------- */
+.re-subhead {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.re-add {
+  margin-top: 10px;
+}
+
+.re-muted {
+  color: var(--ink-3);
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.re-ok {
+  color: var(--ok);
+  font-size: 12px;
+}
+
+.re-warn {
+  color: var(--warn);
+  font-size: 12px;
+}
+
+.re-issue {
+  font-size: 12px;
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 6px;
+}
+
+.re-issue.re-error {
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+.re-issue.re-warning {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.re-issue.re-info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.re-notice {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+
+.re-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--info);
+  border-radius: 6px;
+  background: var(--info-bg);
+  color: var(--info);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.re-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  margin-top: 13px;
+}
+
+@media (max-width: 900px) {
+  .re-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+.re-mono {
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  padding: 4px 0;
+}
+
+.method-template-button {
+  margin-left: auto;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+/* ============================================================
+   SPT inline row editing and entry grid.
+
+   Number inputs read as plain text boxes here: the browser's
+   up/down spinner arrows are noise in a dense numeric table and
+   invite mis-clicks that change a depth by one.
+   ============================================================ */
+
+.spt-inline-edit input[type="number"]::-webkit-outer-spin-button,
+.spt-inline-edit input[type="number"]::-webkit-inner-spin-button,
+.spt-entry-grid input[type="number"]::-webkit-outer-spin-button,
+.spt-entry-grid input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.spt-inline-edit input[type="number"],
+.spt-entry-grid input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Keep the inline-edit boxes compact so the row does not jump in height.
+   min-width only, because .modal-input sets width: 100% - overriding that
+   would fight the existing rule instead of sizing the box. */
+.spt-inline-edit .spt-inline-input {
+  min-width: 84px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+/* Matches the specificity of the existing ".dtable tbody td" padding rule it
+   has to beat, so a row being edited stays the same height as the rest. */
+.spt-inline-edit.dtable tbody td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Delete-confirmation dialog: a compact card, not a full-width takeover. */
+.spt-delete-modal {
+  width: min(420px, 100%);
+}
+
+/* Changes-pending-approval dialog: wider than the delete card, because it
+   renders a five-column diff (Field / Old / New / By / When). Clamped so a
+   narrow phone still gets the full-width treatment .modal already applies. */
+.spt-diff-modal {
+  width: min(760px, 100%);
+}
+
+/* =========================================
+   COMPACT RECORD TABLES (phone)
+   ========================================= */
+
+/* A wide table used to be solved by scrolling sideways, which hid the
+   right-hand columns: the soil description was cut mid-sentence and
+   Edit/Delete sat past the right edge with no affordance. On a phone the
+   scroll cost more than it gave.
+
+   Instead a read-only record table becomes a stack of labelled cards, one
+   per row. Every value stays visible with no horizontal scroll, and the
+   header row is dropped because each field now carries its own label.
+
+   Scoped deliberately:
+     * .dtable only, so an editable grid is untouched - SPT entry rows
+       hold an input per cell and a stacked card would break the form.
+     * :not(.spt-entry-grid *) so the SPT entry grid keeps its layout.
+     * :not(.table-scroll--no-cards *) so panels whose tables carry no
+       data-label stay real tables. A card built from an unlabelled cell
+       shows a blank label column and the reader loses the field names.
+       FieldAuditPanel, QAApprovalTab and HistoricDataTab are marked with
+       that class for exactly this reason. LabData register tables do not
+       use .dtable and so were never in scope here.
+     * 640px and below, so desktop and tablet are unchanged.
+   The row markup is untouched too: this is pure CSS, driven by the
+   data-label attribute each cell already carries. */
+/* ---------------------------------------------------------
+   Project attachments (SharePoint-backed file store)
+   --------------------------------------------------------- */
+
+.attachments-panel {
+  max-width: 960px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.attachments-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.attachments-title {
+  margin: 2px 0 0;
+  font-size: 20px;
+}
+
+.attachments-body {
+  padding: 18px 20px 22px;
+  overflow-y: auto;
+}
+
+.attachments-hint {
+  margin: 0 0 10px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.attachments-hint code {
+  background: var(--surface-2, #f2f4f7);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.attachments-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.attachments-upload input[type="file"] {
+  font-size: 13px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  width: 100%;
+}
+
+.attachments-status,
+.attachments-empty {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.attachments-empty {
+  padding: 28px 16px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+
+.attachment-grid {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.attachment-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface, #fff);
+  display: flex;
+  flex-direction: column;
+}
+
+.attachment-media {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: var(--surface-2, #f2f4f7);
+  border: 0;
+  display: block;
+}
+
+.attachment-frame {
+  height: 200px;
+}
+
+.attachment-nopreview {
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface-2, #f2f4f7);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.attachment-nopreview span {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.attachment-nopreview a {
+  color: var(--accent, #0b6bcb);
+  font-size: 13px;
+}
+
+.attachment-meta {
+  padding: 10px 12px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.attachment-name {
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.attachment-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px 12px;
+  margin-top: auto;
+}
+
+.attachment-actions .btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 8px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.error-note {
+  padding: 10px 12px;
+  border-left: 4px solid var(--danger, #c0392b);
+  background: var(--danger-bg, #fdecea);
+  color: var(--danger, #c0392b);
+  font-size: 13px;
+  border-radius: 6px;
+  margin: 10px 0 0;
+}
+
+@media (max-width: 640px) {
+  .attachment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .attachments-body {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Both scroll wrappers have to release: overflow-x: auto keeps the
+     container scrollable sideways even once the table inside it has
+     stopped being wide. .borehole-records-scroll additionally pins a
+     min-width on its table, which has to go too or the cards inherit it. */
+  .table-scroll:has(> .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *)),
+  .borehole-records-scroll:has(> .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *)) {
+    overflow-x: visible;
+  }
+
+  .borehole-records-scroll:has(> .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *)) table {
+    min-width: 0;
+  }
+
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *),
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody,
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody tr,
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Header row is redundant once every cell is labelled. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) thead {
+    display: none;
+  }
+
+  /* One card per record. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody tr {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  /* A field reads "Depth From (m)  1.50" with the label beside the value,
+     so a long soil description gets the full width instead of being
+     clipped by a neighbouring column. The label column is sized so the
+     longest real label ("Ground Level / RL (m)") fits on one line at
+     390px rather than wrapping and making the card look ragged. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td {
+    display: grid;
+    grid-template-columns: minmax(104px, 38%) 1fr;
+    gap: 10px;
+    align-items: baseline;
+    padding: 3px 0;
+    border-bottom: 0;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+  }
+
+  /* Empty cells would otherwise leave a dangling label. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td:empty {
+    display: none;
+  }
+
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td::before {
+    content: attr(data-label);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+  }
+
+  /* Values are the point of the card, so they get the stronger colour
+     and are allowed to wrap rather than truncate. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td:not(:has(> .btn)),
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td:not(:has(> button)) {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* Numbers stay right-aligned, but against the full card width. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td.num {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Action row: label on the left, buttons filling the rest so the
+     targets are comfortably tappable. */
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td:last-child {
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td:last-child > .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dtable:not(.spt-entry-grid *, .table-scroll--no-cards *) tbody td:last-child .btn {
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 40px;
+  }
+}
+
+/* The SPT entry grid is a form, not a record list: each row is an input
+   row and must stay a row. This re-asserts that after the rules above
+   so the two can never fight if a selector is ever loosened. */
+@media (max-width: 640px) {
+  .spt-entry-grid .dtable,
+  .spt-entry-grid .dtable tbody,
+  .spt-entry-grid .dtable tbody tr,
+  .spt-entry-grid .dtable tbody td,
+  .spt-entry-grid .dtable thead,
+  .spt-entry-grid .dtable thead tr,
+  .spt-entry-grid .dtable thead th {
+    display: revert;
+  }
+
+  .spt-entry-grid .dtable tbody tr {
+    display: table-row;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .spt-entry-grid .dtable tbody td {
+    display: table-cell;
+    padding: 10px 12px;
+    white-space: nowrap;
+    max-width: 320px;
+  }
+
+  .spt-entry-grid .dtable thead {
+    display: table-header-group;
+  }
+
+  .spt-entry-grid .dtable thead th {
+    display: table-cell;
+  }
+
+  .spt-entry-grid .dtable tbody td::before {
+    content: none;
+  }
+}
+
+/* =========================================================
+   BORELOG REPORT — Field Data → Overview
+
+   A depth-proportional continuous log: one row of columns
+   whose widths come from the server's own column list (the same
+   centimetre widths the PDF lays out at), with every block
+   positioned at a percentage of total depth. A stratum 8 m
+   thick is drawn eight times taller than one 1 m thick, and an
+   SPT test sits at the base of its 45 cm drive.
+
+   The screen never splits at a page boundary. The PDF does.
+   ========================================================= */
+
+.borelog-report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.borelog-report .module-toolbar {
+  margin-bottom: 0;
+}
+
+.borelog-report-sheet {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.borelog-report-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.borelog-report-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.borelog-report-meta-item {
+  min-width: 0;
+}
+
+.borelog-report-meta dt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.borelog-report-meta dd {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.borelog-report-note {
+  margin: var(--space-3) 0 0;
+  font-size: 11.5px;
+}
+
+/* The dynamic counts in the note, kept visually distinct from the static
+   sentence so the numbers read as a figure rather than as prose. */
+.borelog-report-counts {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+/* --- the scroll region ----------------------------------------------------
+   One scroll container for the whole log. Capped so the page itself still
+   scrolls; the cap is on the sheet, never on the log, so no part of the log
+   can end up hidden behind a second scroll region. */
+
+.borelog-report-scroll {
+  margin-top: var(--space-3);
+  max-height: 72vh;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+/* Column headers, outside the scrolling body so they stay put. The leading
+   spacer matches the scale gutter below, so headers line up with columns. */
+.borelog-columns {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.borelog-column-header {
+  padding: 8px 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-2);
+  border-right: 1px solid var(--line);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.borelog-column-header:last-child {
+  border-right: 0;
+}
+
+.borelog-column-header--scale {
+  flex: 0 0 var(--borelog-scale-width, 58px);
+  width: var(--borelog-scale-width, 58px);
+}
+
+/* The scale gutter and the log sit side by side. The body may be taller than
+   the log -- it carries the termination band -- so both children are pinned to
+   the log's own height rather than stretched, or the axis and the log would
+   describe different depths at the same pixel. */
+.borelog-body {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+}
+
+/* The depth scale, in its own gutter to the left of the log. The PDF puts the
+   scale in the page margin for the same reason: it is a reference axis, not a
+   column of the record. */
+.borelog-scale {
+  position: relative;
+  flex: 0 0 var(--borelog-scale-width, 58px);
+  width: var(--borelog-scale-width, 58px);
+  border-right: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.borelog-depth-tick {
+  position: absolute;
+  right: 5px;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.borelog-depth-tick::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  width: 5px;
+  height: 1px;
+  background: var(--ink-3);
+}
+
+/* --- the log -------------------------------------------------------------
+   A flex row of ten columns. The height is set inline from total depth, which
+   is what makes a thick stratum read as thick. */
+
+/* The log keeps its own height, set inline from total depth; the body adds a
+   band underneath for the termination note. */
+.borelog-log {
+  display: flex;
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--surface);
+}
+
+/* Each column is the positioning context for its absolutely-placed children. */
+.borelog-col {
+  position: relative;
+  border-right: 1px solid var(--line);
+  min-width: 0;
+}
+
+.borelog-col:last-of-type {
+  border-right: 0;
+}
+
+/* --- soil profile --------------------------------------------------------
+   One continuous hatched strip: a stratum's bar is exactly its thickness, so
+   the column reads as a stratigraphic section rather than a stack of boxes.
+   Rock is solid, exactly as the PDF draws it. */
+
+.borelog-profile-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  border-top: 1px solid var(--ink-2);
+  border-bottom: 1px solid var(--ink-2);
+}
+
+/* Rock was a solid fill, which is the usual borehole-log convention and is
+   why it needed no legend. But the profile column stacks one bar per layer at
+   its depth, and a cored interval that overlaps a soil stratum -- which the
+   Rock form used to accept silently -- painted straight over it and the
+   layer underneath simply vanished. It read as a broken render.
+
+   Now it is still unmistakably rock -- a dark band on a heavier diagonal
+   than any soil hatch, with a solid outline -- but translucent, so whatever
+   it overlaps stays legible underneath instead of being hidden. */
+.borelog-profile-rock {
+  background-color: color-mix(in srgb, var(--ink) 32%, transparent);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 4px,
+    color-mix(in srgb, var(--ink) 78%, transparent) 4px 6px
+  );
+  outline: 1px solid var(--ink);
+  outline-offset: -1px;
+}
+
+/* v6's nine hatch patterns, expressed as CSS. Each is visually distinct so
+   consecutive strata read apart at a glance. */
+.borelog-hatch-fwd {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 5px,
+    var(--ink-3) 5px 6px
+  );
+}
+
+.borelog-hatch-back {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 5px,
+    var(--ink-3) 5px 6px
+  );
+}
+
+.borelog-hatch-cross {
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 5px, var(--ink-3) 5px 6px),
+    repeating-linear-gradient(-45deg, transparent 0 5px, var(--ink-3) 5px 6px);
+}
+
+.borelog-hatch-horizontal {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 5px,
+    var(--ink-3) 5px 6px
+  );
+}
+
+.borelog-hatch-plus {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 5px, var(--ink-3) 5px 6px),
+    repeating-linear-gradient(90deg, transparent 0 5px, var(--ink-3) 5px 6px);
+}
+
+.borelog-hatch-dot {
+  background-image: radial-gradient(var(--ink-3) 0.9px, transparent 1px);
+  background-size: 7px 7px;
+}
+
+.borelog-hatch-star {
+  background-image:
+    radial-gradient(var(--ink-3) 0.9px, transparent 1.1px),
+    radial-gradient(var(--ink-3) 0.9px, transparent 1.1px);
+  background-size: 11px 11px;
+  background-position: 0 0, 5.5px 5.5px;
+}
+
+.borelog-hatch-circle {
+  background-image: radial-gradient(
+    circle,
+    transparent 3px,
+    var(--ink-3) 3px,
+    var(--ink-3) 4px,
+    transparent 4px
+  );
+  background-size: 9px 9px;
+}
+
+.borelog-hatch-circle-lg {
+  background-image: radial-gradient(
+    circle,
+    transparent 4px,
+    var(--ink-3) 4px,
+    var(--ink-3) 5px,
+    transparent 5px
+  );
+  background-size: 12px 12px;
+}
+
+/* --- description --------------------------------------------------------- */
+
+.borelog-description-cell {
+  position: absolute;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  padding: 3px 7px;
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.borelog-desc-text {
+  font-size: 11.5px;
+  line-height: 1.28;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* Rock recovery and RQD, as the PDF prints them over the SPT block. */
+.borelog-rock-detail {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.3;
+  color: var(--ink-3);
+}
+
+/* --- depth and thickness -------------------------------------------------
+   The depth is printed at the base of its stratum, where the PDF puts it and
+   where the rule falls. */
+
+.borelog-stratum-depth {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  color: var(--ink-2);
+}
+
+.borelog-thickness-cell {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--ink);
+}
+
+/* --- SPT markers ---------------------------------------------------------
+   Absolutely positioned at the base of the 45 cm drive, so a test recorded at
+   1.50 m is drawn at 1.95 m -- the same point the PDF plots it at. */
+
+.borelog-spt-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+.borelog-spt-plot-marker {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.borelog-plot-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--line);
+}
+
+.borelog-plot-dot {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--err);
+  transform: translateY(-50%);
+}
+
+.borelog-plot-annot {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--err);
+}
+
+/* --- water table and termination -----------------------------------------
+   Full-width rules at their own depth, spanning the log the way the PDF's do. */
+
+/* Left and width come from the description column's own percentages, so the
+   rule follows the column rather than running across the SPT numbers. */
+.borelog-water-table {
+  position: absolute;
+  z-index: 5;
+  border-top: 1px dashed var(--info);
+  pointer-events: none;
+}
+
+.borelog-water-table > span {
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  padding: 0 3px;
+  background: var(--surface);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--info);
+  white-space: nowrap;
+}
+
+.borelog-termination {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  transform: translateY(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* When the banner would cover the last SPT values it drops into the band below
+   the log instead. The component decides this from the measured gap between the
+   final test and the base of the hole; see `noteOverlapsLastTest`. */
+.borelog-termination--in-band {
+  top: auto !important;
+  bottom: -28px;
+  transform: none;
+}
+
+.borelog-termination > span {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--surface);
+  border: 1px solid var(--err);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--err);
+}
+
+@media (max-width: 900px) {
+  .borelog-report-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .borelog-report-scroll {
+    --borelog-scale-width: 46px;
+  }
+}
+
+@media (max-width: 600px) {
+  .borelog-report-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .borelog-report-sheet {
+    padding: var(--space-3);
+  }
+
+  .borelog-report-scroll {
+    --borelog-scale-width: 40px;
+  }
+}
+
+/* ---------- Sample Register (Lab Data) ---------- */
+/* The Location filter is the same control the Test Register uses; this is just
+   the single-column variant of it. */
+.sample-register-filters {
+  display: grid;
+  grid-template-columns: minmax(200px, 260px);
+  margin: 0;
+}
+
+.sample-register-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sample-register-filters label span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+
+.sample-register-filters select {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.sample-register-filters select:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.sample-register-filters select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* .dtable locks every cell to nowrap, which is right for short code and number
+   columns but makes this 10-column Rock table wider than the panel and scroll
+   sideways by 40-200px at normal desktop widths. The headers and the free-text
+   rock description are the only cells that actually need the extra room, so
+   those wrap instead. Every other .dtable in the app is untouched. */
+.dtable.sample-register-table thead th {
+  white-space: normal;
+}
+
+.sample-register-table td[data-label="Type of Rock"] {
+  white-space: normal;
+  min-width: 120px;
+  max-width: 220px;
+}
+
+/* ---------- Rock: individual core pieces ---------- */
+/* One Block Number box per piece, stacked in a single cell so each run can
+   carry a different number of pieces than its neighbour. */
+.rock-pieces {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 190px;
+}
+
+.rock-piece {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rock-piece-label {
+  flex: 0 0 62px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-align: right;
+}
+
+.rock-piece-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rock-piece-remove {
+  flex: 0 0 auto;
+  padding: 2px 7px;
+  line-height: 1;
+  color: var(--ink-2);
+}
+
+.rock-piece-remove:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+.rock-piece-add {
+  align-self: flex-start;
+}
+
+/* Recovery and RQD are derived, so they read as output rather than input. */
+.rock-derived {
+  display: inline-block;
+  min-width: 52px;
+  padding: 6px 8px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+}
+
+.rock-piece-warning {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.rock-unit-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rock-unit-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+
+/* =========================================================
+   ROCK RECORDS — expanded piece strip
+   ---------------------------------------------------------
+   Each saved run keeps one data row for the numbers and gives
+   every block its own labelled chip on a full-width row
+   underneath. Labels sit above values, so the strip reads
+   "Piece 1 / Piece 2 / ..." left to right and the row grows
+   taller rather than cramming the lengths into one cell.
+   ========================================================= */
+
+/* Reads as a detail panel attached to the row above it, not as a
+   record of its own: no top border, slightly recessed fill. */
+.dtable .rock-record-pieces > td {
+  padding: 10px 12px 12px;
+  background: var(--surface-2);
+  border-top: 0;
+  border-bottom: 1px solid var(--line);
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: none;
+}
+
+.rock-pieces-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.rock-piece-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  min-width: 76px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.rock-piece-chip-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.rock-piece-chip-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   SAMPLE REGISTER — QR code picker and print sheet
+   ========================================================= */
+
+.qr-picker-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.qr-picker-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.qr-picker-counts {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qr-picker-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.qr-picker-field label,
+.qr-picker-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+
+.qr-picker-field select {
+  min-height: 38px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.qr-picker-radio-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  min-height: 38px;
+  align-items: center;
+}
+
+.qr-picker-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.qr-picker-radio input[type="radio"],
+.qr-picker-radio input[type="checkbox"],
+.qr-picker-sample-item input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  margin: 0;
+  cursor: pointer;
+}
+
+.qr-picker-sample-list {
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.qr-picker-sample-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.qr-picker-sample-item:last-child {
+  border-bottom: 0;
+}
+
+.qr-picker-sample-item:hover {
+  background: var(--surface-2);
+}
+
+.qr-picker-sample-id {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 170px;
+}
+
+.qr-picker-actions {
+  justify-content: flex-end;
+}
+
+/* --- Print sheet --- */
+
+.qr-print-modal {
+  width: min(960px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+}
+
+.qr-print-sheet {
+  padding: 20px;
+  background: var(--surface);
+}
+
+.qr-print-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.qr-print-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  background: var(--surface);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.qr-print-card img {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  margin: 0 auto 6px;
+}
+
+.qr-print-project {
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.qr-print-sample {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.qr-print-meta {
+  font-size: 11px;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+
+.qr-print-kind {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+
+@media (max-width: 900px) {
+  .qr-print-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Print: hide everything except the sheet, which is pinned to the page
+   origin. Three columns stays a comfortable fit for 25 mm labels. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .qr-print-sheet,
+  .qr-print-sheet * {
+    visibility: visible;
+  }
+
+  /* The sheet stays out of flow so the visibility-hidden app behind it
+     cannot push it onto page two. But it must be taken out of flow with
+     top/left only. The original used `inset: 0`, which pins bottom and
+     right too, so the sheet's height collapsed to the containing block's
+     height -- the viewport. The grid then overflowed a fixed-height box and
+     the paginator sliced through it, cutting every QR in half. */
+  .qr-print-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  /* Every scrolling/clamping container between the page and the sheet has to
+     stop constraining height in print. `100vh` resolves to the page box when
+     printing, so `max-height: calc(100vh - 48px)` clipped the sheet to a
+     single page no matter how many samples were selected. */
+  .modal-backdrop {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    padding: 0 !important;
+    background: none !important;
+    overflow: visible !important;
+  }
+
+  .modal,
+  .qr-print-modal {
+    position: static !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    width: 100% !important;
+  }
+
+  .qr-print-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6mm;
+  }
+
+  /* Keep a label whole across a page break, and keep its QR whole inside
+     the label. Without this a page boundary can land between the two. */
+  .qr-print-card {
+    border: 1px solid #999999;
+    border-radius: 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .qr-print-card img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .qr-print-no-print {
+    display: none !important;
+  }
+}

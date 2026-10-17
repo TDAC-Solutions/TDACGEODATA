@@ -1,0 +1,93 @@
+The goal, in the client's terms
+------------------------------
+Store project files - site photos, videos, drawings, documents - in the
+SharePoint the client already pays for, and keep only a link in PostgreSQL.
+No file bytes in the database. Any project can have files; any SPT record
+can have its own files.
+
+What that turned into
+---------------------
+  /Documents/{project_id}/{filename}                 project-level files
+  /Documents/{project_id}/samples/{sample_id}/{filename}   sample-level files
+
+Files are visible and previewable from the app without opening SharePoint,
+and every upload records who did it.
+
+Why SAMPLE_ID is the anchor, not depth
+--------------------------------------
+update_spt_record allows ISPT_TOP to change. A depth-anchored attachment
+is orphaned by a depth correction, and keeping it would need its own UPDATE
+in step with every edit. SAMPLE_ID is allocated once and survives the edit,
+so a photo stays with its record. It also generalises: cores, UD samples and
+lab specimens all have one.
+
+The blocker that shaped the work
+--------------------------------
+SAMPLE_ID is only allocated when a record is submitted. Measured on the live
+database, 29 of 36 SPT rows had none and so could not hold a file at all.
+A migration (server/scripts/migration_spt_sample_identity.sql) backfills
+them, so every SPT row is photo-capable the moment it lands. Additive only:
+no AGS table touched, no existing row modified, no sample id renumbered.
+
+Migration safeguards
+--------------------
+- Backfilled rows are APPROVED, never PENDING. Writing PENDING would drop 29
+  records nobody submitted into the admin approval queue.
+- The shared SAMPLE_ID_COUNTER is advanced past every allocated id in the
+  same transaction, so the next manual submit cannot collide.
+- The counter floor is derived from both SPT_RECORD_STATUS and
+  SAMPLING_RECORD_ID, which share the generator.
+- A DO block rolls the whole run back if any ISPT row would still lack a
+  sample id. A half-applied backfill is worse than none.
+- Dry-run on a database clone first, then applied live and verified:
+  36/36 rows with distinct ids, 0 missing, 0 phantom PENDING.
+
+Bugs found and fixed during review
+----------------------------------
+1. Large uploads always failed. Graph returns the finished item on the last
+   chunk PUT and the uploadUrl is single-use afterwards; the code issued a
+   follow-up GET that answered 404. Every file over 4 MB - most site photos,
+   every video - raised. Now the last PUT's response is the result.
+
+2. Images and video rendered broken. driveItem.webUrl and the /preview getUrl
+   are both HTML viewer pages, so an <img> or <video> pointed at either
+   decodes nothing. Added GET /api/attachments/{project}/{id}/content, which
+   streams the item's actual bytes. Media now points there, which also keeps
+   files behind TDAC auth instead of exposing Graph's short-lived URLs.
+
+3. Concurrent first-uploads split a project across two folders.
+   conflictBehavior=rename created TDAC-1 and TDAC-1 1 and scattered the
+   project's files. Now fail, with a re-read on collision: one project maps
+   to exactly one folder.
+
+4. Preview URLs expired after about an hour. Added
+   POST /{project}/{id}/refresh-preview and a Refresh preview button.
+
+5. The SPT list dropped sample_id. The service returned it but the router
+   maps fields explicitly, so the badge would have rendered nothing.
+
+Security boundaries held
+------------------------
+- Path segments are percent-encoded and "." / ".." replaced, so a crafted
+  project or filename cannot escape the project folder.
+- Client secrets never logged, echoed or returned; the health probe reports
+  only whether the five variables are present.
+- Existence is checked before configuration, so a bad sample id returns 404
+  rather than a misleading 503 on a correctly configured server.
+- A sample id from another project is rejected before any upload.
+- Azure credentials never reach the browser. The frontend calls this
+  backend; the backend talks to Graph.
+
+Deliberate restraint
+---------------------
+- Deleting a file removes the metadata row only. The SharePoint item stays.
+  Removing from the client's document store should not be one click.
+- Deleting an SPT record clears its attachment metadata in the same
+  transaction, so nothing dangles, but the files themselves remain.
+
+Known limitation, stated rather than hidden
+-------------------------------------------
+Access is role-based: any signed-in user who can open a project can see its
+attachments. TDAC has no per-user project scoping and this did not add any.
+Worth revisiting before the client stores anything sensitive. Field photos of
+active sites can be.

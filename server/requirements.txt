@@ -1,0 +1,65 @@
+# TDAC Backend — Python dependencies
+# Install with:  pip install -r requirements.txt
+
+# Web framework
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+
+# PostgreSQL (async driver used by app/database.py)
+asyncpg==0.30.0
+
+# Request / response validation
+pydantic==2.11.7
+
+# Excel input-sheet parsing (app/spreadsheet_import/) + multipart uploads
+openpyxl==3.1.5
+python-multipart==0.0.32
+
+# Microsoft Graph transport for SharePoint attachments
+# (app/attachments/sharepoint_client.py)
+httpx==0.28.1
+
+# Borelog report rendering (app/borelog_report/pdf_renderer.py).
+# The v6 script drew its log with matplotlib; the port keeps the same drawing
+# calls. Imported lazily, so this cost is only paid when a PDF is requested.
+# numpy is matplotlib's own dependency -- the report module does not import it
+# directly -- pinned here so a rebuild is reproducible.
+matplotlib==3.9.2
+
+# Lab engine result sheets (app/lab_engine/pdf.py wraps the TDAC dev-package
+# renderers). Same lazy-import rule as matplotlib: the cost is only paid when
+# a result sheet is requested. reportlab is pure Python and installs on
+# Termux; pinned to the version the engine PDFs were verified against.
+reportlab==4.4.10
+
+# The v6 rock-logging appendix (app/borelog_report/rock_appendix.py): the
+# reportlab table is joined behind the matplotlib log pages with pypdf. Same
+# lazy-import rule -- a preview request imports neither.
+pypdf==6.17.0
+
+# The v6 soil-profile narrative export
+# (app/borelog_report/profile_docx.py). python-docx pulls lxml; pinned so a
+# rebuild is reproducible.
+python-docx==1.2.0
+lxml==6.1.3
+
+
+
+# JWT handling (app/auth/security.py)
+python-jose[cryptography]
+
+# Environment variable loading (app/config.py)
+python-dotenv
+
+# Password hashing (app/auth/security.py)
+pwdlib[bcrypt]
+
+# --- Testing (server/tests) ---
+# Run with:  cd server && ./venv/bin/python -m pytest
+pytest==9.1.1
+pytest-cov==7.1.0  # httpx moved above: fastapi.testclient and app/attachments both need it
+
+# QR codes for the Sample Register (app/qr_service.py). Pure-Python, emits SVG,
+# so there is no Pillow or other C extension to build -- which matters on
+# Termux -- and prints sharp at any size.
+segno==1.6.1

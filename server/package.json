@@ -1,0 +1,11 @@
+{
+  "name": "tdac-server",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m uvicorn app.main:app --port 8000",
+    "dev": "python3 -m uvicorn app.main:app --reload --port 8000",
+    "test": "python3 -m pytest",
+    "seed-admin": "python3 scripts/seed_admin.py",
+    "init-db": "psql -h 127.0.0.1 -U postgres -f scripts/init_local_db.sql"
+  }
+}

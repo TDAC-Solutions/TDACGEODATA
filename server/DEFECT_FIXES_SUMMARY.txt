@@ -1,0 +1,149 @@
+The second review round: defects found, and what was actually wrong
+------------------------------------------------------------------
+
+This round came from two external reports (bugs.txt, issues.txt) covering
+the attachment work. Every claim was checked against the live code before
+anything was changed. Most were real. Two were not.
+
+Claims that did not hold up, and one I got wrong
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. "SPT bulk create returns 500 on a duplicate." Real after all, and my
+   earlier summary was wrong to dismiss it. The UniqueViolationError catch
+   found during the first pass belongs to create_borehole_record, not to
+   create_spt_records_bulk; attributing it to the SPT path was my error.
+   The SPT bulk path had a pre-check followed by a bare execute, so two
+   concurrent submissions of the same depth both saw nothing and the loser
+   raised a raw UniqueViolationError that surfaced as a 500 instead of the
+   409 the caller expects. It is now guarded, matching the pre-check.
+
+2. "bcrypt silently truncates at 72 bytes." It does not truncate, it
+   raises. pwdlib's BcryptHasher throws ValueError past 72 bytes, and
+   verify_password had no guard, so the claim understated the problem: a
+   73-byte password turned login into a 500. The defect was real, the
+   reasoning about it was not.
+
+The media pipeline could not render anything at all
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The panel pointed <img> and <video> at the content URL. A media element
+cannot send an Authorization header, and TDAC has no cookie auth anywhere,
+so every image and video requested anonymously and rendered broken.
+
+  - Added a short-lived token, typed "media", that the content route accepts
+    as ?mt= when no header is present. It grants nothing on its own: the
+    route still resolves the user and checks the project. Typed separately
+    so it can never be replayed as an access or refresh token.
+  - Graph answers /content with a 302 to a CDN URL, and httpx does not
+    follow redirects inside client.stream(), so every download was treated
+    as a failure. The redirect is now followed manually with the
+    Authorization header stripped on the second hop.
+  - Range was read from a query parameter, but browsers send it as a
+    request header, so a video seek never reached the handler. Now read from
+    the header, forwarded to Graph, answered 206 with Content-Range, and
+    advertised with Accept-Ranges.
+  - Responses are Cache-Control: private, because the bytes sit behind
+    per-user auth.
+
+Sample uploads could not have worked at all
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  - create_folder posted the whole path as driveItem.name. Graph rejects a
+    name containing "/", so "TDAC-1/samples/TDAC-1-16" failed outright.
+    The path is now walked one segment at a time.
+  - SharePointError carried no HTTP status, so folder creation
+    string-matched "HTTP 404" and treated any failure as "folder absent".
+    It now carries status_code and branches on 404 and 409.
+  - sample_belongs_to_project consulted only SPT_RECORD_STATUS, so a core
+    sample could not hold a file. It now checks both sample tables.
+
+Deployment was impossible
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Three hardcoded http://127.0.0.1:8000 literals, which resolve to the phone
+itself, so the app only worked on the developer's laptop. Replaced by
+client/src/config.ts reading the build environment and defaulting to
+same-origin, which is the correct topology behind a single reverse proxy.
+
+  VITE_API_BASE_URL=            empty = same-origin (recommended)
+  VITE_APP_ENV=production       the single deployment switch
+  VITE_FORCE_HTTPS=false        browsers need HTTPS for media Range
+
+Added client/.env.example documenting all of it, a Vite dev proxy for /api
+so a media URL resolves in development, and a .gitignore exception so the
+example is tracked while the real .env is not.
+
+Silent data loss in the spreadsheet import
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+These would have reached the client as wrong numbers rather than errors.
+
+  - The CSV and XLSX readers clipped rows and columns at the cap with no
+    message, so a 2,500-row file imported its first 2,000 and reported
+    success. Both now refuse and say what to do instead.
+  - A workbook with two Borelog sheets, one per borehole, kept only the
+    last and discarded every earlier layer. Sheets now accumulate, and
+    ProjectInfo merges rather than overwrites.
+  - normalize_rows indexed error.errors()[0]["msg"] blindly. An empty
+    errors list or a missing key raised inside the handler, masking the
+    real validation problem as a 500.
+
+Correctness
+~~~~~~~~~~~
+  - The four metric cards and the Portfolio Status table each declared
+    their own status groupings, so a Superseded project read "Completed" on
+    a card and "Unspecified" in the table directly below it. Both now derive
+    from one STATUS_BUCKETS map, so they cannot disagree.
+  - Project creation wrote PROJ and PROJ_METADATA on separate connections,
+    so a metadata failure left a bare project row the client believed was
+    complete. Now one transaction.
+  - Depths, blow counts, recovery and RQD accepted negative or
+    out-of-range values, which corrupt the depth profile and the average-N
+    calculation with nothing downstream flagging it.
+  - Filename truncation stripped the extension, leaving a formatless file
+    SharePoint and the browser could not identify. The stem is now truncated
+    and the extension kept, and a leading dot survives so ".env" stays a
+    hidden file.
+  - The refresh token travelled as a query parameter, which lands in access
+    logs, proxy logs and browser history. Now a JSON body, and a test
+    asserts the query-string form is refused.
+  - A username-only profile edit forced a full re-login. token_gen is now
+    bumped only for a password or role change. Deactivation still revokes;
+    reactivation does not, because there is no session to revoke.
+  - The sign-out button revoked every device while reading "Sign out".
+    Relabelled to "Sign out of all devices" rather than weakening the
+    revocation.
+
+Honest UI, nothing removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Two buttons looked live and did nothing. Both are disabled with a reason,
+which reads as "not yet built" rather than "broken". No feature was removed.
+
+  - A batch upload overwrote its error message per file, so three failures
+    out of five reported only the last. Errors now accumulate with a
+    success count, so a partial batch says what worked.
+  - AddLocaModal closes on Escape and on a backdrop press, guarded on
+    !saving so a stray keypress cannot abandon an in-flight create.
+  - Historic Data debounces its filter fetch; typing "BH-03" fired five
+    requests.
+  - Test Register indexes tests by sample instead of rescanning the whole
+    array once per row.
+
+What was deliberately not implemented
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The review proposed a fetch interceptor that attaches the Authorization
+header to <img> and <video> requests. An <img> is not a fetch call, so no
+interceptor can give it a header; the media token solves the real problem
+with less machinery. Where the review's structure was sound but the
+mechanism was not, the intent was kept and the mechanism replaced.
+
+Known limitation, unchanged
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Access remains role-based: any signed-in user who can open a project can
+see its attachments. TDAC has no per-user project scoping and this work did
+not add any. Worth deciding before the client stores anything sensitive.
+
+Verification
+~~~~~~~~~~~~
+357 backend tests pass, up from 346, with 11 added and each fix
+negative-controlled. The frontend type-checks and builds clean, and the
+production bundle contains no hardcoded address. The live database is
+untouched: 36 ISPT rows, 36 status rows, 0 attachments, counter at 46.
+
+Not verified: no browser click-through. The media token flow is the one
+thing worth watching on a real upload, thumbnail and video scrub included.

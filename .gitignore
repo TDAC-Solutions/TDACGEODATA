@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+server/venv/
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+.env
+.env.*
+!.env.example
+*.pyc
+
+# Node / Vite
+node_modules
+dist
+dist-ssr
+*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python
+server/venv/
+server/__pycache__/
+*.pyc
+.env
+# Test reports & artifacts (generated)
+server/TEST_REPORT.md
+server/TEST_REPORT.pdf
+.coverage
+htmlcov/
+.pytest_cache/
+
+/server/app/attachments/storage.py
+
+# Change log written for review, generated per work session. Local only: it
+# duplicates the committed history and the diff it describes.
+changes.txt
+update.txt

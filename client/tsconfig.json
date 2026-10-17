@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    /* Catches the class of bug that only appears on Windows and macOS: two
+       files in one directory whose names differ only by case are distinct on
+       Linux and collide everywhere else. Without this, tsc passes on the
+       machine that wrote the code and the bundle breaks on the machine that
+       runs it. */
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": false
+  },
+  "include": ["src", "*.test.mjs", "*.test.tsx"]
+}
