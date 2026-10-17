@@ -114,6 +114,15 @@ export function CreateProjectPage() {
       return;
     }
 
+    // The <select> carries the required attribute, so the browser normally
+    // blocks this. Checking here too means a submission that bypasses native
+    // validation (tests, embeds, API-shaped callers) cannot post a null
+    // project_type into the metadata table.
+    if (!form.project_type) {
+      setError("Project type is required.");
+      return;
+    }
+
     if (!form.project_client.trim()) {
       setError("Client name is required.");
       return;
@@ -288,9 +297,15 @@ export function CreateProjectPage() {
         },
       };
 
-      await createProject(data);
+      // Open the workspace we just created. The number comes from the server
+      // response, not the form: in Automatic mode the field only previews the
+      // next free ID, and another request may have taken it first.
+      // Fall back to the form value only if the response is missing the row.
+      const result = await createProject(data);
+      const createdId =
+        result?.project?.project_number ?? form.project_id.trim();
 
-      navigate("/");
+      navigate(`/project/${encodeURIComponent(createdId)}`);
     } catch (err) {
       console.error("Failed to create project:", err);
 

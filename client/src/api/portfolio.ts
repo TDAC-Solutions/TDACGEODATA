@@ -73,9 +73,24 @@ export interface CreateProjectPayload {
   metadata?: CreateProjectMetadata | null;
 }
 
+// The server answers with the row it actually inserted. The caller has to
+// navigate with project_number from here, not with the ID typed or previewed
+// in the form: in Automatic mode the form shows the next free number, but a
+// parallel request can claim it first, so the server's reply is the only
+// authoritative ID.
+export interface CreateProjectResponse {
+  message: string;
+  project: {
+    project_number: string;
+    project_name: string;
+    country_region: string;
+    client: string;
+  };
+}
+
 export async function createProject(
   data: CreateProjectPayload
-) {
+): Promise<CreateProjectResponse> {
   const response = await apiClient("/api/portfolio/projects", {
     method: "POST",
 

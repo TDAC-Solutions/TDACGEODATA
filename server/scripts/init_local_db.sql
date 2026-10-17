@@ -1,13 +1,16 @@
 -- TDAC_clean local database bootstrap.
 --
 -- Creates the exact tables the application touches and nothing else:
---   ags42: PROJ, LOCA, GEOL, CORE, ISPT  (column types follow the AGS 4.2
---          type-map used by the AGSValidator schema builder: ID/PA/X ->
---          TEXT, nDP -> NUMERIC, DT -> TIMESTAMP WITH TIME ZONE)
+--   ags42: PROJ, LOCA, GEOL, CORE, ISPT, WSTG  (column types follow the
+--          AGS 4.2 type-map used by the AGSValidator schema builder:
+--          ID/PA/X -> TEXT, nDP -> NUMERIC, DT -> TIMESTAMP WITH TIME ZONE)
 --   tdac:  roles, users                  (auth contract of app/auth/*)
 --          PROJ_METADATA                  (project/report settings read and
 --                                          written by portfolio_service.py,
 --                                          including PROJECT_TYPE)
+--          PROJECT_ID_COUNTER             (allocate_project_id) — without it
+--                                          a fresh clone 500s on the very
+--                                          first "Add New Project"
 --
 -- Idempotent: safe to re-run. Runs against the single real database
 -- ags42_data (same one the app and the AGS projects use):
@@ -27,8 +30,18 @@ CREATE TABLE IF NOT EXISTS "ags42"."PROJ" (
     "PROJ_ID"   TEXT PRIMARY KEY,
     "PROJ_NAME" TEXT,
     "PROJ_LOC"  TEXT,
-    "PROJ_CLNT" TEXT
+    "PROJ_CLNT" TEXT,
+    "PROJ_ENG"  TEXT,
+    "PROJ_CONT" TEXT
 );
+
+-- A database created before these columns existed keeps its old shape.
+-- create_project() writes consultant and contractor on every insert, so a
+-- clone without them 500s with UndefinedColumn on the first project.
+ALTER TABLE "ags42"."PROJ"
+    ADD COLUMN IF NOT EXISTS "PROJ_ENG" TEXT;
+ALTER TABLE "ags42"."PROJ"
+    ADD COLUMN IF NOT EXISTS "PROJ_CONT" TEXT;
 
 CREATE TABLE IF NOT EXISTS "ags42"."LOCA" (
     "LOCA_ID"   TEXT NOT NULL,
@@ -36,8 +49,27 @@ CREATE TABLE IF NOT EXISTS "ags42"."LOCA" (
     "LOCA_STAR" TIMESTAMP WITH TIME ZONE,
     "LOCA_ENDD" TIMESTAMP WITH TIME ZONE,
     "LOCA_FDEP" NUMERIC,
+    "LOCA_GL"   NUMERIC,
+    "LOCA_NATE" NUMERIC,
+    "LOCA_NATN" NUMERIC,
+    "LOCA_LAT"  TEXT,
+    "LOCA_LON"  TEXT,
     "PROJ_ID"   TEXT NOT NULL REFERENCES "ags42"."PROJ" ("PROJ_ID")
 );
+
+-- The location screen reads and writes all of these (see get_project_locas
+-- and create_project_loca), so an older clone gets them added rather than
+-- failing the moment a borehole is opened.
+ALTER TABLE "ags42"."LOCA"
+    ADD COLUMN IF NOT EXISTS "LOCA_GL" NUMERIC;
+ALTER TABLE "ags42"."LOCA"
+    ADD COLUMN IF NOT EXISTS "LOCA_NATE" NUMERIC;
+ALTER TABLE "ags42"."LOCA"
+    ADD COLUMN IF NOT EXISTS "LOCA_NATN" NUMERIC;
+ALTER TABLE "ags42"."LOCA"
+    ADD COLUMN IF NOT EXISTS "LOCA_LAT" TEXT;
+ALTER TABLE "ags42"."LOCA"
+    ADD COLUMN IF NOT EXISTS "LOCA_LON" TEXT;
 
 -- Rule 10a: the KEY columns (*) form the identity of each record.
 CREATE UNIQUE INDEX IF NOT EXISTS uq_loca_ident
@@ -86,6 +118,21 @@ CREATE TABLE IF NOT EXISTS "ags42"."ISPT" (
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_ispt_ident
     ON "ags42"."ISPT" ("LOCA_ID", "ISPT_TOP", "PROJ_ID");
+
+-- WSTG holds the water strikes recorded when a location is created. The
+-- unique index is the conflict target create_project_loca() names in its
+-- ON CONFLICT, so saving the same strike twice is a quiet no-op.
+CREATE TABLE IF NOT EXISTS "ags42"."WSTG" (
+    "PROJ_ID"   TEXT NOT NULL,
+    "LOCA_ID"   TEXT NOT NULL,
+    "WSTG_DPTH" NUMERIC NOT NULL,
+    "WSTG_DTIM" TIMESTAMP WITH TIME ZONE,
+    FOREIGN KEY ("PROJ_ID", "LOCA_ID")
+        REFERENCES "ags42"."LOCA" ("PROJ_ID", "LOCA_ID")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_wstg_identity
+    ON "ags42"."WSTG" ("PROJ_ID", "LOCA_ID", "WSTG_DPTH");
 
 -- ---------------------------------------------------------------------
 -- tdac auth schema (app/auth/user_service.py contract)
@@ -153,3 +200,21 @@ CREATE TABLE IF NOT EXISTS "tdac"."PROJ_METADATA" (
 
 ALTER TABLE "tdac"."PROJ_METADATA"
     ADD COLUMN IF NOT EXISTS "PROJECT_TYPE" TEXT;
+
+-- ---------------------------------------------------------------------
+-- tdac project-id counter (allocate_project_id)
+-- ---------------------------------------------------------------------
+-- One row per year/month; the upsert in allocate_project_id bumps
+-- LAST_NUMBER atomically so two people clicking Create at the same moment
+-- cannot be handed the same number. Without this table the first project
+-- creation on a fresh clone dies with UndefinedTable.
+
+CREATE TABLE IF NOT EXISTS "tdac"."PROJECT_ID_COUNTER" (
+    "YEAR"        INTEGER NOT NULL,
+    "MONTH"       INTEGER NOT NULL,
+    "LAST_NUMBER" INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY ("YEAR", "MONTH")
+);
+
+ALTER TABLE "tdac"."PROJECT_ID_COUNTER"
+    ADD COLUMN IF NOT EXISTS "LAST_NUMBER" INTEGER NOT NULL DEFAULT 0;

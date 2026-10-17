@@ -95,46 +95,73 @@ async def create_project_record(
         # acquired their own connection and committed independently, so a
         # metadata failure left a bare project row that the client believed
         # had metadata.
+        #
+        # Both inserts have to stay INSIDE this block. The metadata insert
+        # once sat one indent level out, which meant the acquire() block
+        # closed and handed the connection back to the pool before it ran:
+        # the PROJ row had already committed, the insert then died with
+        # "connection has been released back to the pool", and the caller
+        # saw a 500 for a project that was actually half-saved. Keeping
+        # them nested is what makes them commit together or not at all.
         async with database.pool.acquire() as connection:
             async with connection.transaction():
                 created_project = await create_project(
                     connection=connection,
-                    project_number = project_number,
-            project_name = project.project_name,
-                country_region = project.project_location,
-                client = project.project_client,
-                consultant_name = project.consultant_name,
-                contractor_name = project.contractor_name
-            )
-
-        if project.metadata is not None:
-                await create_project_metadata(
-                    connection=connection,
-                    project_id=project_number,
-                    road_reference=project.metadata.road_reference,
-                    chainage_text=project.metadata.chainage_text,
-                    structure_reference=project.metadata.structure_reference,
-                    selected_boreholes=project.metadata.selected_boreholes,
-                    project_type=project.metadata.project_type,
-                    report_type=project.metadata.report_type,
-                    report_title=project.metadata.report_title,
-                    report_volume_title=project.metadata.report_volume_title,
-                    document_reference=project.metadata.document_reference,
-                    revision=project.metadata.revision,
-                    report_date=project.metadata.report_date,
-                    issue_status=project.metadata.issue_status,
-                    tdac_company_name=project.metadata.tdac_company_name,
-                    groundwater_basis=project.metadata.groundwater_basis,
-                    design_standard_basis=project.metadata.design_standard_basis,
-                    factor_of_safety_basis=project.metadata.factor_of_safety_basis,
-                    load_combination_basis=project.metadata.load_combination_basis,
-                    construction_verification_requirement=(
-                        project.metadata.construction_verification_requirement
-                    ),
-                    pile_load_test_requirement=(
-                        project.metadata.pile_load_test_requirement
-                    ),
+                    project_number=project_number,
+                    project_name=project.project_name,
+                    country_region=project.project_location,
+                    client=project.project_client,
+                    consultant_name=project.consultant_name,
+                    contractor_name=project.contractor_name,
                 )
+
+                if project.metadata is not None:
+                    await create_project_metadata(
+                        connection=connection,
+                        project_id=project_number,
+                        road_reference=project.metadata.road_reference,
+                        chainage_text=project.metadata.chainage_text,
+                        structure_reference=(
+                            project.metadata.structure_reference
+                        ),
+                        selected_boreholes=(
+                            project.metadata.selected_boreholes
+                        ),
+                        project_type=project.metadata.project_type,
+                        report_type=project.metadata.report_type,
+                        report_title=project.metadata.report_title,
+                        report_volume_title=(
+                            project.metadata.report_volume_title
+                        ),
+                        document_reference=(
+                            project.metadata.document_reference
+                        ),
+                        revision=project.metadata.revision,
+                        report_date=project.metadata.report_date,
+                        issue_status=project.metadata.issue_status,
+                        tdac_company_name=(
+                            project.metadata.tdac_company_name
+                        ),
+                        groundwater_basis=(
+                            project.metadata.groundwater_basis
+                        ),
+                        design_standard_basis=(
+                            project.metadata.design_standard_basis
+                        ),
+                        factor_of_safety_basis=(
+                            project.metadata.factor_of_safety_basis
+                        ),
+                        load_combination_basis=(
+                            project.metadata.load_combination_basis
+                        ),
+                        construction_verification_requirement=(
+                            project.metadata.
+                            construction_verification_requirement
+                        ),
+                        pile_load_test_requirement=(
+                            project.metadata.pile_load_test_requirement
+                        ),
+                    )
 
     except Exception as error:
         error_text = str(error)

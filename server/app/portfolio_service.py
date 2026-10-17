@@ -528,17 +528,26 @@ async def update_project_overview(
                 project_id,
             )
 
+        # The client hands this row straight back into its project header,
+        # which speaks in lowercase field names. Without the aliases the row
+        # came back as PROJ_NAME etc., the header read project_name as
+        # undefined and blanked every field to "—" right after a save. The
+        # alias list mirrors get_project() exactly so the two endpoints
+        # cannot drift apart again.
         project = await connection.fetchrow(
             """
             SELECT
-                "PROJ_ID",
-                "PROJ_NAME",
-                "PROJ_LOC",
-                "PROJ_CLNT",
-                "PROJ_ENG",
-                "PROJ_CONT"
-            FROM "ags42"."PROJ"
-            WHERE "PROJ_ID" = $1
+                p."PROJ_ID"       AS project_id,
+                p."PROJ_NAME"     AS project_name,
+                p."PROJ_LOC"      AS project_location,
+                p."PROJ_CLNT"     AS project_client,
+                p."PROJ_ENG"      AS consultant_name,
+                p."PROJ_CONT"     AS contractor_name,
+                pm."PROJECT_TYPE" AS project_type
+            FROM "ags42"."PROJ" p
+            LEFT JOIN "tdac"."PROJ_METADATA" pm
+                ON pm."PROJ_ID" = p."PROJ_ID"
+            WHERE p."PROJ_ID" = $1
             """,
             project_id,
         )
